@@ -1,0 +1,38 @@
+name: Cypress Automation CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Cypress Tests
+        run: npx cypress run
+
+      - name: Upload Artifacts
+        # We added if: always() so it still uploads screenshots even if a test fails!
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Cypress-Test-Results
+          path: |
+            reports/
+            cypress/screenshots/
+            cypress/videos/
